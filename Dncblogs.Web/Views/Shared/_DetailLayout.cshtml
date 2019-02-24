@@ -1,0 +1,185 @@
+﻿
+@{
+    Layout = null;
+    DetailContentLayoutViewModel detailContentLayoutViewModel = (DetailContentLayoutViewModel)ViewBag.DetailContentLayoutViewModel;
+}
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="keywords" content="@TempData[" KeyWord"]" />
+    <meta name="description" content="@TempData["Description"]" />
+    <meta name="author" content="zhongzw" />
+    <meta name="copyright" content="www.dncblogs.cn" />
+
+    <title>@TempData["Title"]</title>
+    <link href="~/css/base.css" rel="stylesheet" />
+    <link href="~/css/blogcss.css" rel="stylesheet" />
+    @*<link href="~/css/blogcssm.css" rel="stylesheet" />*@
+    <link href="~/ueditor/third-party/SyntaxHighlighter/shCoreDefault.css" rel="stylesheet" />
+
+
+    <script src="~/js/jquery-1.12.4.min.js"></script>
+
+    <script src="~/ueditor/third-party/SyntaxHighlighter/shCore.js"></script>
+    <script src="~/ueditor/ueditor.parse.js"></script>
+
+</head>
+
+<body>
+    <div id="body_allwrap">
+        <!-- 头 -->
+        <div id="body_header">
+            <h1>@detailContentLayoutViewModel.UserDto.UserName</h1>
+            <h2>@detailContentLayoutViewModel.UserDto.BlogDesc</h2>
+            <ul class="personalnav">
+                @if (TempData["LoginUser"] != null)
+                {
+                    UserDto userDto = (UserDto)TempData["LoginUser"];
+                    if (userDto.UserId == 1)
+                    {
+                        <li>
+                            <a href="/Admin/Home/Index" target="_blank">@userDto.UserName</a>
+                        </li>
+                    }
+                    else
+                    {
+                        <li>
+                            <a href="/User/Home/Index" target="_blank">@userDto.UserName</a>
+                        </li>
+                    }
+                    <li>
+                        <a href="/User/SingOut">退出</a>
+                    </li>
+                }
+                else
+                {
+                    <li><a href="/User/Register/" target="_blank">注册</a></li>
+                    <li><a href="/User/Signin/" target="_blank">登录</a></li>
+                }
+            </ul>
+            <ul class="menu" id="headMenu">
+                <li><a href="/Blog/Index?id=@detailContentLayoutViewModel.UserDto.UserId&categoryId=0 " id="labHomeUrl">@(string.IsNullOrEmpty(detailContentLayoutViewModel.UserDto.BlogName) ? detailContentLayoutViewModel.UserDto.UserName : detailContentLayoutViewModel.UserDto.BlogName)</a></li>
+                <li><a href="/" id="labIndexUrl">首页</a></li>
+                <li><a href="/User/Home/Index" id="labAdminUrl">管理</a></li>
+            </ul>
+        </div>
+
+        <!--左侧导航栏-->
+        <div id="body_sidebar">
+            <div class="gutter">
+                <div class="aboutauthor">
+
+                    <h3>公告信息</h3>
+                    <hr />
+                    <span class="aboutauthor_notice">
+                        @detailContentLayoutViewModel.UserDto.BlogNotice
+                    </span>
+
+
+                    <h3 class="aboutauthor_h3">文章分类</h3>
+                    <hr />
+                    <div class="publiclist_sidebar">
+                        <ul>
+                            @foreach (var ic in @detailContentLayoutViewModel.UserDto.Categorys)
+                            {
+                                <li><a href="/Blog/Index?id=@detailContentLayoutViewModel.UserDto.UserId&categoryId=@ic.CategoryId">@ic.CategoryName</a> (@ic.BlogCount)</li>
+                            }
+                        </ul>
+                    </div>
+
+
+                    <h3 class="aboutauthor_h3">最新评论</h3>
+                    <hr />
+                    <div class="publiclist_sidebar">
+                        <ul>
+                            @if (TempData["IsNews"] != null && (bool)TempData["IsNews"])
+                            {
+                                foreach (var ibc in (List<NewsCommentDto>)TempData["UserNewsCommentList"])
+                                {
+                                    <li> <a title="支持" href="/Blog/ShowBlog/@ibc.NewsId">@ibc.ContentAbs</a> </li>
+                                }
+                            }
+                            else
+                            {
+                                foreach (var ibc in (List<BlogCommentDto>)TempData["UserBlogCommentList"])
+                                {
+                                    <li> <a title="支持" href="/Blog/ShowBlog/@ibc.BlogId">@ibc.ContentAbs</a> </li>
+                                }
+                            }
+
+                            @*<li>
+                                    <a title="看不到别人的印象和造句！！！" href="/cyq1162/article-detail-58058">看不到别人的印象和造句！！！</a>
+                                </li>
+                                <li>
+                                    <a title="svn 账号密码" href="/cyq1162/article-detail-54527">svn 账号密码</a>
+                                </li>
+                                <li>
+                                    <a title="哈哈哈，很强，过两年我也会如此叼~" href="/cyq1162/article-detail-58056">哈哈哈，很强，过两年我也会如此叼~</a>
+                                </li>
+                                <li>
+                                    <a title="关注的人很少哦。" href="/cyq1162/article-detail-58098">关注的人很少哦。</a>
+                                </li>
+                                <li>
+                                    <a title="又来学习咯" href="/cyq1162/article-detail-54527">又来学习咯</a>
+                                </li>
+                                <li>
+                                    <a title="填到那一项呢？" href="/cyq1162/article-detail-54440">填到那一项呢？</a>
+                                </li>
+                                <li>
+                                    <a title="真不错" href="/cyq1162/article-detail-54370">真不错</a>
+                                </li>
+                                <li>
+                                    <a title="恩，这种总结的思路挺好的，学习学习。" href="/cyq1162/article-detail-58060">恩，这种总结的思路挺好的，学习学习。</a>
+                                </li>
+                                <li>
+                                    <a title="不错" href="/cyq1162/article-detail-54370">不错</a>
+                                </li>*@
+                        </ul>
+                    </div>
+
+
+                    <h3>友情链接</h3>
+                    <hr />
+                    <div class="publiclist_sidebar">
+                        <ul id="labLinks">
+                            <li>
+                                <a target="_blank" href="http://www.cyqdata.com/" title="路过秋天博客">路过秋天</a>
+                            </li>
+                            <li>
+                                <a target="_blank" href="http://www.cnblogs.com/" title="博客园">博客园</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div id="body_content">
+
+            <div id="loading">
+
+            </div>
+
+            @RenderBody()
+
+            <!--尾部-->
+            <div id="Node_Foot" class="footer">
+                <div class="powered">
+                    Copyright &copy; 2018-2022 power by
+                    <a target="_blank" href="http://www.dncblogs.cn">
+                        dnc
+                    </a> -
+                    <a href="http://www.dncblogs.cn" target="_blank">dnc</a>
+                    v2.0 All Rights Reserved
+                    <br />
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

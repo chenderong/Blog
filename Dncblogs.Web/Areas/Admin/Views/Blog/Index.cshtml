@@ -1,0 +1,302 @@
+﻿@*@{
+        Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+    }*@
+
+<link href="~/bootstrap/datetimepicker/css/bootstrap-datetimepicker.min.css" rel="stylesheet" />
+<script src="~/bootstrap/datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+<script src="~/bootstrap/datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+<style>
+    #divMian {
+        padding: 5px;
+    }
+</style>
+
+
+<div id="divMian">
+
+    <div class="form-inline" role="form">
+        <a href="/Admin/Blog/Add" class="btn btn-primary">添加博客</a>
+        <div class="form-group">
+            <input id="keyword" type="text" class="form-control" style="width:200px;" placeholder="请输入名称">
+        </div>
+        <div class="form-group">
+            <label>发布时间</label>
+        </div>
+
+        <div class="form-group">
+            <div class="input-group date form_date" data-date="" value="@DateTime.Now.ToString("yyyy-MM-dd")" data-date-format="yyyy-MM-dd" data-link-format="yyyy-MM-dd">
+                <input id="startTime" class="form-control" size="13" type="text" value="@DateTime.Now.ToString("yyyy-MM-dd")" readonly>
+                <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>至</label>
+        </div>
+
+        <div class="form-group">
+            <div class="input-group date form_date" data-date="" value="@DateTime.Now.ToString("yyyy-MM-dd")" data-date-format="yyyy-MM-dd" data-link-format="yyyy-MM-dd">
+                <input id="endTime" class="form-control" size="13" type="text" value="@DateTime.Now.ToString("yyyy-MM-dd")" readonly>
+                <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <select id="categorySelect" class="form-control">
+                <option value="0">全部</option>
+                @foreach (var ic in ViewBag.CyList)
+                {
+                    <option value="@ic.CategoryId">@ic.CategoryName</option>
+                }
+            </select>
+
+        </div>
+
+        <button id="btnQuery" type="button" class="btn btn-primary">查询</button>
+    </div>
+
+    <table id="tbBlogs"></table>
+
+</div>
+
+
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabel">提示信息</h4>
+            </div>
+            <div id="mdText" class="modal-body">提示信息</div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal">确定</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+@Html.AntiForgeryToken()
+
+<script type="text/javascript">
+
+    $('.form_date').datetimepicker({
+        language: 'zh-CN',
+        format: "yyyy-mm-dd",
+        weekStart: 1,
+        todayBtn: 1,
+        autoclose: 1,
+        todayHighlight: 1,
+        startView: 2,
+        minView: 2,
+        forceParse: 0
+    });
+
+    $('.form_date').datetimepicker({
+        language: 'zh-CN',
+        format: "yyyy-mm-dd",
+        weekStart: 1,
+        todayBtn: 1,
+        autoclose: 1,
+        todayHighlight: 1,
+        startView: 2,
+        minView: 2,
+        forceParse: 0
+    });
+
+    var pageReload = false;
+    var keyWord = '';//搜索关键字
+    var startTime;
+    var endTime;
+    var categoryId = 0;
+
+
+
+    $(function () {
+        //模态窗体 关闭后动作
+        $('#myModal').on('hidden.bs.modal', function () {
+            // 执行一些动作...
+            //重新加载页面
+            if (pageReload) {
+                location.reload();
+            }
+        });
+
+        $("#btnQuery").click(function () {
+            categoryId = $("#categorySelect").val();
+            keyWord = $("#keyword").val();
+            startTime = $("#startTime").val();
+            endTime = $("#endTime").val();
+            //搜索博客
+            var params = $('#tbBlogs').bootstrapTable('getOptions');
+            params.queryParams = function (params) {
+                var temp = {   //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+                    limit: params.limit,   //页面大小
+                    page: (params.offset / params.limit) + 1,  //页码
+                    categoryId: categoryId,
+                    keyWord: keyWord,
+                    startTime: startTime,
+                    endTime: endTime
+                };
+                return temp;
+            }
+            $('#tbBlogs').bootstrapTable('refresh', params);
+        });
+
+        //1.初始化Table
+        var oTable = new TableInit();
+        oTable.Init();
+    });
+
+
+    var TableInit = function () {
+        var oTableInit = new Object();
+        //初始化Table
+        oTableInit.Init = function () {
+            $('#tbBlogs').bootstrapTable({
+                url: '/Admin/Blog/GetListByPageTable',         //请求后台的URL（*）
+                method: 'get',                      //请求方式（*）
+                toolbar: '#toolbar',                //工具按钮用哪个容器
+                striped: false,                      //是否显示行间隔色
+                cache: false,                       //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
+                pagination: true,                   //是否显示分页（*）
+                sortable: false,                     //是否启用排序
+                sortOrder: "asc",                   //排序方式
+                queryParams: oTableInit.queryParams,//传递参数（*）
+                sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
+                pageNumber: 1,                       //初始化加载第一页，默认第一页
+                pageSize: 15,                       //每页的记录行数（*）
+                pageList: [10, 15, 20, 30, 50, 100],        //可供选择的每页的行数（*）
+                search: false,                       //是否显示表格搜索，此搜索是客户端搜索，不会进服务端，所以，个人感觉意义不大
+                strictSearch: true,
+                showColumns: true,                  //是否显示所有的列
+                showRefresh: true,                  //是否显示刷新按钮
+                minimumCountColumns: 2,             //最少允许的列数
+                clickToSelect: true,                //是否启用点击选中行
+                height: 0,                        //行高，如果没有设置height属性，表格自动根据记录条数觉得表格高度
+                uniqueId: "blogId",                     //每一行的唯一标识，一般为主键列
+                showToggle: false,                    //是否显示详细视图和列表视图的切换按钮
+                cardView: false,                    //是否显示详细视图
+                detailView: false,                   //是否显示父子表
+                columns: [
+                    {
+                        field: 'createDate',
+                        title: '添加时间',
+                        width: '150'
+                    },
+                    {
+                        field: 'user.userName',
+                        title: '用户',
+                        width: '100'
+                    },
+                    {
+                        field: 'categoryDto.categoryName',
+                        title: '类别',
+                        width: '150'
+                    },
+                    {
+                        field: 'title',
+                        title: '文章标题',
+                        formatter: 'checkLookFormatter',
+                    },
+                    {
+                        field: 'visitCount',
+                        title: '访问量',
+                        width: '80'
+                    }
+                    ,
+                    {
+                        field: 'commentCount',
+                        title: '评论数',
+                        width: '80'
+                    },
+                    {
+                        field: 'blogId',
+                        title: '操作',
+                        formatter: 'actionFormatter',
+                        width: '200'
+                    }
+                ]
+            });
+        };
+
+        //得到查询的参数
+        oTableInit.queryParams = function (params) {
+            var temp = {   //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+                limit: params.limit,   //页面大小
+                page: (params.offset / params.limit) + 1,  //页码
+                categoryId: categoryId,
+                keyWord: keyWord,
+                startTime: startTime,
+                endTime: endTime
+            };
+            return temp;
+        };
+        return oTableInit;
+    };
+
+    //操作
+    function actionFormatter(value, row, index) {
+        //console.log(row);
+        return [
+            '<a href="/Admin/Blog/Add/' + value + '" class="btn btn-xs btn-primary" title="编辑"><i class="fa fa-edit"></i>编辑</a>',
+            '<a href="javascript:void(0)" class="btn btn-xs btn-primary m-l-xs" title=' + (row.isEssence ? "取消精华" : "设置精华") + ' onclick="essenceBlog(' + value + ',' + row.isEssence + ')"><i class="' + (row.isEssence ? "glyphicon glyphicon-minus" : "glyphicon glyphicon-plus") + '"></i>精华</a>',
+            '<a href="javascript:void(0)" class="btn btn-xs btn-primary m-l-xs" title=' + (row.isHomePage ? "取消首页显示" : "设置精华首页显示") + ' onclick="SetHomePage(' + value + ',' + row.isHomePage + ')"><i class="' + (row.isHomePage ? "glyphicon glyphicon-ok" : "glyphicon glyphicon-remove") + '"></i>首页</a>',
+            '<a href="javascript:void(0)" class="btn btn-xs btn-danger m-l-xs" title="删除" onclick="delBlog(' + value + ')"><i class="fa fa-close"></i> 删除</a>',
+        ].join('');
+    }
+
+    //查看博客
+    function checkLookFormatter(value, row, index) {
+        return [
+            '<a href="/Blog/LookBlog/' + row.blogId + '" title="' + row.title + '" target="_blank" >' + row.title + '</a>',
+        ].join('');
+    }
+
+    //删除博客
+    function delBlog(id) {
+        if (confirm("你确定要删除该博客？")) {
+            var token = $("input[name='__RequestVerificationToken']").val();
+            pageReload = false;
+            $.post("/Admin/Blog/Delete/", { blogId: id, __RequestVerificationToken: token }, function (data) {
+                if (data.code === 0) {
+                    pageReload = true;
+                }
+                showDialog(data.msg);
+            });
+        }
+    }
+    //设置博客精华
+    function essenceBlog(blogId, isEssence) {
+        if (confirm("你确定要" + (isEssence ? "取消" : "设置") + "该博客精华？")) {
+            pageReload = false;
+            var token = $("input[name='__RequestVerificationToken']").val();
+            $.post("/Admin/Blog/Essence/", { blogId: blogId, isEssence: isEssence, __RequestVerificationToken: token }, function (data) {
+                if (data.code == 0) {
+                    pageReload = true;
+                }
+                showDialog(data.msg);
+            });
+        }
+    }
+
+    //设置博客 博客首页显示
+    function SetHomePage(blogId, isHomePage) {
+        if (confirm("你确定要" + (isHomePage ? "取消" : "设置") + "该博客首页显示？")) {
+            pageReload = false;
+            var token = $("input[name='__RequestVerificationToken']").val();
+            $.post("/Admin/Blog/SetHomePage/", { blogId: blogId, isHomePage: isHomePage, __RequestVerificationToken: token }, function (data) {
+                if (data.code == 0) {
+                    pageReload = true;
+                }
+                showDialog(data.msg);
+            });
+        }
+    }
+
+    function showDialog(msg) {
+        $('#mdText').text(msg)
+        $('#myModal').modal('show')
+    }
+
+</script>

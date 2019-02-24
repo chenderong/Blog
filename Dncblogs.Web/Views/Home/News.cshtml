@@ -1,0 +1,258 @@
+﻿
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<!--分类选项列表-->
+@section nav_Category{
+    <li><a href="/">首页</a></li>
+    <li><a href="/Home/News" class="current_nav">新闻</a></li>
+    <li><a href="/Home/OpenSource">开源项目</a></li>
+
+}
+
+
+<!--新闻列表-->
+<div class="post_list" id="labArticleList">
+
+</div>
+
+
+<script>
+    var maxPageSize = 15;//显示页数     1 2 3 4
+    var pageSize = 15;//每页显示条数
+    var pageIndex = 1;//当前页码
+    var pageTotalCount;//总页数
+    var keyWord = '';//搜索关键字
+    var $sPageList;
+    $(function () {
+        //获取页面列表对象
+        $sPageList = $("#sPageList");
+        loadNews();
+
+        //首页
+        $("#aFirstPage").click(function () {
+            pageIndex = 1;
+            loadNews();
+        });
+
+        //上一页
+        $("#aPrevPage").click(function () {
+            pageIndex -= 1;
+            if (pageIndex <= 1) {
+                pageIndex = 1;
+            }
+            loadNews();
+        });
+
+        //下一页
+        $("#aNextPage").click(function () {
+            pageIndex += 1;
+            if (pageIndex >= pageTotalCount) {
+                pageIndex = pageTotalCount;
+            }
+            loadNews();
+        });
+
+        //尾页
+        $("#aLastPage").click(function () {
+            pageIndex = pageTotalCount;
+            loadNews();
+        });
+
+        //搜索
+        $("#btnSearch").click(function () {
+            search();
+        });
+
+    });
+
+    //加载新闻
+    //function loadNews() {
+    //    var token = $("input[name='__RequestVerificationToken']").val();
+    //    $.post("/Home/GetNewsListByPage", { keyWord: keyWord, pageSize: pageSize, pageIndex: pageIndex, __RequestVerificationToken: token }, function (data) {
+    //        if (data.code === 0) {
+    //            pageTotalCount = Math.ceil(data.count / pageSize);//计算总页数
+    //            showPage(pageIndex);
+    //            showNews(data.data);
+    //        } else {
+    //            alert("加载新闻失败！");
+    //        }
+    //    });
+    //}
+
+    //加载新闻
+    function loadNews() {
+        $('#labArticleList').html("");
+        var token = $("input[name='__RequestVerificationToken']").val();
+        var loadDiv = $("#loading");
+        $.ajax({
+            url: "/Home/GetNewsListByPage"
+            , cache: false
+            , type: "POST"
+            , dataType: "json"
+            , data: { keyWord: keyWord, pageSize: pageSize, pageIndex: pageIndex, __RequestVerificationToken: token }
+            , beforeSend: function (XMLHttpRequest) {
+                loadDiv.show();
+            }
+            , success: function (data, textStatus) {
+                loadDiv.hide();
+                if (data.code === 0) {
+                    pageTotalCount = Math.ceil(data.count / pageSize);//计算总页数
+                    showPage(pageIndex);
+                    showNews(data.rows);
+                } else {
+                    alert("加载新闻失败！");
+                }
+            }
+            , complete: function (XMLHttpRequest, textStatus) {
+                loadDiv.hide();
+            }
+        });
+    }
+
+    var spageHtml = '<span > ··· </span>';//页面省略号
+    //显示页码
+    function showPage(pageIndex) {
+        var showPageCount = maxPageSize;
+        if (pageTotalCount < maxPageSize) {
+            showPageCount = pageTotalCount;
+        }
+        var html = '';
+
+        if (pageTotalCount <= showPageCount) {// 总页数 <=  显示页数
+            for (var i = 1; i <= pageTotalCount; i++) {
+                if (pageIndex == i) {
+                    html += '<a class="currIndex" href="javascript:void(0)" onclick="jumpPage(this.innerHTML)" >' + i + '</a>';
+                }
+                else {
+                    html += '<a  href="javascript:void(0)" onclick="jumpPage(this.innerHTML)" >' + i + '</a>';
+                }
+            }
+            $sPageList.html(html);
+        }
+        else {
+            if (pageIndex >= pageTotalCount) {//当前页码 >= 总页数
+                for (var i = pageTotalCount - showPageCount; i <= pageTotalCount; i++) {
+                    if (pageIndex == i) {
+                        html += '<a class="currIndex" href="javascript:void(0)" onclick="jumpPage(this.innerHTML)" >' + i + '</a>';
+                    }
+                    else {
+                        html += '<a  href="javascript:void(0)" onclick="jumpPage(this.innerHTML)" >' + i + '</a>';
+                    }
+                }
+                if (pageIndex == pageTotalCount) {//当前页码 == 总页数
+                    html = spageHtml + html;
+                }
+                $sPageList.html(html);
+            }
+            else if (pageIndex >= showPageCount) {//当前页码 >= 显示页数
+                var lePageCount = pageTotalCount - pageIndex;//剩下的页数
+                if (lePageCount > showPageCount) {//剩下的页数大于要显示的页数
+                    for (var i = pageIndex; i <= showPageCount; i++) {
+                        if (pageIndex == i) {
+                            html += '<a class="currIndex" href="javascript:void(0)" onclick="jumpPage(this.innerHTML)" >' + i + '</a>';
+                        }
+                        else {
+                            html += '<a  href="javascript:void(0)" onclick="jumpPage(this.innerHTML)" >' + i + '</a>';
+                        }
+                    }
+                    html = html + spageHtml;
+                    $sPageList.html(html);
+                }
+                else if (lePageCount == showPageCount) { //剩下的页数==要显示的页数
+                    for (var i = pageIndex; i <= showPageCount; i++) {
+                        if (pageIndex == i) {
+                            html += '<a class="currIndex" href="javascript:void(0)" onclick="jumpPage(this.innerHTML)" >' + i + '</a>';
+                        }
+                        else {
+                            html += '<a  href="javascript:void(0)" onclick="jumpPage(this.innerHTML)" >' + i + '</a>';
+                        }
+                    }
+                    $sPageList.html(html);
+                }
+                else {//剩下的页数 < 要显示的页数
+                    var prePageCount = showPageCount - lePageCount;//pageIndex 前面还要显示的页数
+                    var startPageIndex = pageIndex - prePageCount;//开始显示的页数
+                    var endPageIndex = startPageIndex + showPageCount;//结束显示的页数
+                    for (var i = startPageIndex; i <= endPageIndex; i++) {
+                        if (pageIndex == i) {
+                            html += '<a class="currIndex" href="javascript:void(0)" onclick="jumpPage(this.innerHTML)" >' + i + '</a>';
+                        }
+                        else {
+                            html += '<a  href="javascript:void(0)" onclick="jumpPage(this.innerHTML)" >' + i + '</a>';
+                        }
+                    }
+                    if (endPageIndex == pageTotalCount) {//如果结束页数刚好和 总页数相等
+                        html = spageHtml + html;
+                    }
+                    else {
+                        html = spageHtml + html + spageHtml;
+                    }
+                    $sPageList.html(html);
+                }
+
+            }
+            else {
+                for (var i = 1; i <= showPageCount; i++) {
+                    if (pageIndex == i) {
+                        html += '<a class="currIndex" href="javascript:void(0)" onclick="jumpPage(this.innerHTML)" >' + i + '</a>';
+                    }
+                    else {
+                        html += '<a  href="javascript:void(0)" onclick="jumpPage(this.innerHTML)" >' + i + '</a>';
+                    }
+                }
+                html = html + spageHtml;
+                $sPageList.html(html);
+            }
+        }
+    }
+
+    //选择页面跳转
+    function jumpPage(jumpPageIndex) {
+        pageIndex = parseInt(jumpPageIndex);
+        loadNews();
+    }
+
+    //显示博客
+    function showNews(news) {
+        var html = '';
+        $.each(news, function (i, obj) {
+            html += ' <div class="post_item"> ';
+            html += '   <div class="post_item_body"> ';
+            html += '    <h3> ';
+            html += '      <a id="labTitle" href="/News/NewDetails/' + obj.newsId + '" class="titlelnk" target="_blank">' + obj.title + '</a> ';
+            html += '    </h3> ';
+            html += '    <p class="post_item_summary"> ';
+            html += '       <a href="/" id="labUserID" target="_blank"> ';
+            html += '          <img src="/upload/user-head/default.png" id="labHeadUrl" class="pfs" border="0" align="left" /> ';
+            html += '        </a> ';
+            html += '        <label id="labAbstract"> ';
+            html += obj.bodyAbs;
+            html += '        </label> ';
+            html += '    </p> ';
+            html += '  <div class="post_item_foot"> ';
+            html += '      <a id="labNickName" href="/" class="lightblue">管理员</a> &nbsp;<span id="labCreateTime">' + obj.createDate + ' </span> ';
+            html += '      <span class="article_comment"> <label key="comment" class="gray">[评论]</label><label id="labCommentCount">' + obj.commentCount + '</label></span> ';
+            html += '      <span class="article_view"> <label key="browse" class="gray">[浏览]</label><label id="labHits">' + obj.visitCount + '</label></span> ';
+            html += '  </div> ';
+            html += '  </div> ';
+            html += '  <div class="clear"></div> ';
+            html += ' </div> ';
+            //alert(html);
+        })
+        //alert(html);
+        $('#labArticleList').html(html);
+    }
+
+    //搜索
+    function search() {
+        var inputKeyWord = $("#keyWord").val();
+        if (inputKeyWord === "" && keyWord === "") {
+            return;
+        }
+        keyWord = inputKeyWord;
+        pageIndex = 1;
+        loadNews();
+    }
+
+</script>

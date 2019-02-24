@@ -1,0 +1,145 @@
+﻿
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="keywords" content="@TempData[" KeyWord"]" />
+    <meta name="description" content="@TempData["Description"]" />
+    <meta name="author" content="zhongzw" />
+    <meta name="copyright" content="www.dncblogs.cn" />
+
+    <title>@ViewData["Title"]</title>
+    <link href="~/css/base.css" rel="stylesheet" />
+    <link href="~/css/blogcss.css" rel="stylesheet" />
+
+    <script src="~/js/jquery-1.12.4.min.js"></script>
+</head>
+
+<body>
+    <div id="body_allwrap">
+        <!-- 头 -->
+        <div id="body_header">
+            <h1>@ViewBag.UserDto.UserName</h1>
+            <h2>@ViewBag.UserDto.BlogDesc</h2>
+            <ul class="personalnav">
+                @if (TempData["LoginUser"] != null)
+                {
+                    UserDto userDto = (UserDto)TempData["LoginUser"];
+                    if (userDto.UserId == 1)
+                    {
+                        <li>
+                            <a href="/Admin/Home/Index" target="_blank">@userDto.UserName</a>
+                        </li>
+                    }
+                    else
+                    {
+                        <li>
+                            <a href="/User/Home/Index" target="_blank">@userDto.UserName</a>
+                        </li>
+                    }
+                    <li>
+                        <a href="/User/SingOut">退出</a>
+                    </li>
+                }
+                else
+                {
+                    <li><a href="/User/Register/" target="_blank">注册</a></li>
+                    <li><a href="/User/Signin/" target="_blank">登录</a></li>
+                }
+            </ul>
+            <ul class="menu" id="headMenu">
+                <li><a href="javascript:void(0);" id="labHomeUrl">@ViewBag.UserDto.BlogName</a></li>
+                <li><a href="/" id="labIndexUrl">首页</a></li>
+                <li><a href="/User/Home/Index" id="labAdminUrl">管理</a></li>
+            </ul>
+        </div>
+
+        <!--左侧导航栏-->
+        <div id="body_sidebar">
+            <div class="gutter">
+                <div class="aboutauthor">
+
+                    <h3>公告信息</h3>
+                    <hr />
+                    <span class="aboutauthor_notice">
+                        @ViewBag.UserDto.BlogNotice
+                    </span>
+
+                    <h3 class="aboutauthor_h3">最新开源项目</h3>
+                    <hr />
+                    <div class="publiclist_sidebar">
+                        <ul>
+                            @{
+                                if (ViewData["OpenSource"] != null)
+                                {
+                                    var list = (List<OpenSourceDto>)ViewData["OpenSource"];
+                                    @foreach (var iObj in list)
+                                    {
+                                        <li><a href="#">@iObj.OpenSourceTitle</a></li>
+                                    }
+                                }
+
+                            }
+                        </ul>
+                    </div>
+
+                    <h3 class="aboutauthor_h3">热门开源项目</h3>
+                    <hr />
+                    <div class="publiclist_sidebar">
+                        <ul>
+                            @{
+                                if (ViewData["HeatOpenSource"] != null)
+                                {
+                                    var list = (List<OpenSourceDto>)ViewData["HeatOpenSource"];
+                                    @foreach (var iObj in list)
+                                    {
+                                        <li><a href="#">@iObj.OpenSourceTitle</a></li>
+                                    }
+                                }
+
+                            }
+
+                        </ul>
+                    </div>
+
+
+
+
+
+                    <h3>友情链接</h3>
+                    <hr />
+                    <div class="publiclist_sidebar">
+                        <ul id="labLinks">
+                            <li>
+                                <a target="_blank" href="http://www.cyqdata.com/" title="路过秋天博客">路过秋天</a>
+                            </li>
+                            <li>
+                                <a target="_blank" href="http://www.cnblogs.com/" title="博客园">博客园</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div id="body_content">
+            @RenderBody()
+
+            <!--尾部-->
+            <div id="Node_Foot" class="footer">
+                <div class="powered">
+                    Copyright &copy; 2018-2022 power by
+                    <a target="_blank" href="http://www.dncblogs.cn">
+                        dnc
+                    </a> -
+                    <a href="http://www.dncblogs.cn" target="_blank">dnc</a>
+                    v2.0 All Rights Reserved
+                    <br />
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,253 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="renderer" content="webkit">
+    <title>@TempData["Title"]</title>
+    <link href="~/a_dmin/skin/bootstrap.min.css?v=3.3.6" rel="stylesheet">
+    <link href="~/a_dmin/skin/font-awesome.min.css?v=4.4.0" rel="stylesheet">
+    <link href="~/a_dmin/skin/animsition.css" rel="stylesheet">
+    <link href="~/a_dmin/skin/animate.css" rel="stylesheet">
+    <link href="~/a_dmin/skin/layout.css?v=1.0.0" rel="stylesheet">
+    <link href="~/a_dmin/skin/nav.css?v=1.0.0" rel="stylesheet">
+    <!--[if lt IE 8]>
+    <meta http-equiv="refresh" content="0;url=ie.html" />
+    <![endif]-->
+
+</head>
+<body class="fixed-sidebar full-height-layout gray-bg" style="overflow:hidden">
+    <nav class="navbar navbar-static-top" role="navigation" style="margin-bottom: 0">
+        <div class="navbar-container container-fluid">
+            <ul class="nav navbar-toolbar navbar-left">
+                <li class="nav-header">
+                    <div class="logo">
+                        <span class="logoshow"><img alt="image" class="animated pulse" src="@ViewBag.User.UserHeadImaUrl" style="width:48px; height:48px;" /></span>
+                        <span class="navbar-minimalize navtoggle">
+                            <a href="#">
+                                <i class="fa fa-navicon"></i>
+                            </a>
+                        </span>
+                    </div>
+                </li>
+                <li class="navbar-menu nav-tabs-horizontal nav-tabs-animate" id="main-navMenu">
+                    <ul class="nav navbar-toolbar nav-tabs nav-topmenu main-nav" id="main-nav"></ul>
+                </li>
+            </ul>
+            <ul class="nav navbar-top-links navbar-right nav-tabs">
+                @*<li class="dropdown hidden-xs">
+                    <a class="right-sidebar-toggle" aria-expanded="false">
+                        <i class="fa fa-tasks"></i> 主题
+                    </a>
+                </li>*@
+                <li class="dropdown hidden-xs">
+                    <a data-toggle="dropdown" class="dropdown-toggle" href="#">
+                        <strong class="font-bold">@ViewBag.User.UserName</strong>
+                    </a>
+                    @*<ul class="dropdown-menu dropdown-alerts">
+                            <li>
+                                <a class="J_menuItem" href="profile.html">个人资料</a>
+                            </li>
+                            <li>
+                                <a class="J_menuItem" href="contacts.html">联系我们</a>
+                            </li>
+                        </ul>*@
+                </li>
+                <li class="" style="float: right;">
+                    <a href="/User/LoginOut"><i class="fa fa-sign-out"></i> 退出</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <div id="wrapper">
+        <!--左侧导航开始-->
+        <nav class="navbar-default navbar-static-side" role="navigation">
+            <div class="nav-close">
+                <i class="fa fa-times-circle"></i>
+            </div>
+            <div class="sidebar-collapse side-menu" id="side-menu">
+
+                <div class="side-menu-group active">
+                    <h1 title="dnc博客后台管理" main-nav-icon="fa fa-home"><i class="fa fa-home"></i></h1>
+                    <div class="side-menu-wrap">
+                        <h2><i class="fa fa-home"></i><span>功能列表</span><b class="fa fa-angle-double-down"></b></h2>
+                        <ul class="nav nav-second-level">
+                            <li>
+                                <a href="#"><i class="fa fa-bars"></i>博客信息 <b class="fa arrow"></b></a>
+                                <ul class="nav nav-third-level">
+                                    <li><a class="J_menuItem" href="/User/User/Index" id="1"><i class="fa fa-table"></i>博客信息</a></li>
+                                </ul>
+                            </li>
+                            <li>
+                                <a href="#"><i class="fa fa-bars"></i>分类管理 <b class="fa arrow"></b></a>
+                                <ul class="nav nav-third-level">
+                                    <li><a class="J_menuItem" href="/User/Category/Index" id="1"><i class="fa fa-table"></i>博客分类管理</a></li>
+                                </ul>
+                            </li>
+                            <li>
+                                <a href="#"><i class="fa fa-bars"></i>博客管理 <b class="fa arrow"></b></a>
+                                <ul class="nav nav-third-level">
+                                    <li><a class="J_menuItem" href="/User/Blog/Index"><i class="fa fa-table"></i>博客管理</a></li>
+                                    <li><a class="J_menuItem" href="javascript:void(0)"><i class="fa fa-table"></i>博客评论管理</a></li>
+                                </ul>
+                            </li>
+                            @*<li>
+                                <a href="#"><i class="fa fa-bars"></i>开源项目管理 <b class="fa arrow"></b></a>
+                                <ul class="nav nav-third-level">
+                                    <li><a class="J_menuItem" href="/Admin/OpenSource/Index"><i class="fa fa-table"></i>开源项目管理</a></li>
+                                </ul>
+                            </li>*@
+                            @*<li>
+                                <a href="#"><i class="fa fa-bars"></i>随笔管理 <b class="fa arrow"></b></a>
+                                <ul class="nav nav-third-level">
+                                    <li><a class="J_menuItem" href="/Admin/Note/Index"><i class="fa fa-table"></i>随笔管理</a></li>
+                                </ul>
+                            </li>*@
+                            @*<li>
+                                <a href="#"><i class="fa fa-bars"></i>用户管理 <b class="fa arrow"></b></a>
+                                <ul class="nav nav-third-level">
+                                    <li><a class="J_menuItem" href="javascript:void(0)"><i class="fa fa-table"></i>用户管理</a></li>
+                                </ul>
+                            </li>*@
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        <!--左侧导航结束-->
+        <!--右侧部分开始-->
+        <div id="page-wrapper" class="gray-bg dashbard-1">
+            <div class="row content-tabs">
+                <button class="roll-nav roll-left J_tabLeft"><i class="fa fa-backward"></i></button>
+                <nav class="page-tabs J_menuTabs">
+                    <div class="page-tabs-content">
+                        <a href="javascript:;" class="active J_menuTab" data-id="center.html">首页</a>
+                    </div>
+                </nav>
+                <button class="roll-nav roll-right J_tabRight"><i class="fa fa-forward"></i></button>
+                <div class="btn-group roll-nav roll-right">
+                    <button class="dropdown J_tabClose" data-toggle="dropdown"><i class="fa fa-caret-down"></i></button>
+
+                    <ul role="menu" class="dropdown-menu dropdown-menu-right">
+                        <li class="J_refreshTab"><a><i class="fa fa-refresh"></i> 刷新当前</a></li>
+                        <li class="divider"></li>
+                        <li class="J_tabShowActive"><a><i class="fa fa-map-pin"></i> 定位当前</a></li>
+                        <li class="J_tabCloseOther"><a><i class="fa fa-close"></i> 关闭其他</a></li>
+                        <li class="J_tabCloseAll"><a><i class="fa fa-power-off"></i> 关闭所有</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="row J_mainContent" id="content-main">
+                <iframe class="J_iframe" id="mainFrame" name="mainFrame" style="width: 100%; height: 100%;" src="Welcome" frameborder="0" data-id="Welcome" seamless></iframe>
+            </div>
+
+            <div class="footer">
+                <div class="pull-right">
+                    &copy; 2008-2018 <a href="http://www.dncblogs.cn/" target="_blank">dncblogs</a>
+                </div>
+            </div>
+
+        </div>
+        <!--右侧部分结束-->
+        <!--右侧边栏开始-->
+        <div id="right-sidebar">
+            <div class="sidebar-container">
+                <ul class="nav nav-tabs navs-3">
+                    <li class="active">
+                        <a data-toggle="tab" href="#tab-1">
+                            <i class="fa fa-gear"></i> 主题
+                        </a>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <div id="tab-1" class="tab-pane active">
+                        <div class="sidebar-title">
+                            <h3> <i class="fa fa-comments-o"></i> 主题设置</h3>
+                            <small><i class="fa fa-tim"></i> 你可以从这里选择和预览主题的布局和样式，这些设置会被保存在本地，下次打开的时候会直接应用这些设置。</small>
+                        </div>
+                        <div class="skin-setttings">
+                            <div class="title">主题设置</div>
+                            <div class="setings-item">
+                                <span>收起左侧菜单</span>
+                                <div class="switch">
+                                    <div class="onoffswitch">
+                                        <input type="checkbox" name="collapsemenu" class="onoffswitch-checkbox" id="collapsemenu">
+                                        <label class="onoffswitch-label" for="collapsemenu">
+                                            <span class="onoffswitch-inner"></span>
+                                            <span class="onoffswitch-switch"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="setings-item">
+                                <span>固定顶部</span>
+
+                                <div class="switch">
+                                    <div class="onoffswitch">
+                                        <input type="checkbox" name="fixednavbar" class="onoffswitch-checkbox" id="fixednavbar">
+                                        <label class="onoffswitch-label" for="fixednavbar">
+                                            <span class="onoffswitch-inner"></span>
+                                            <span class="onoffswitch-switch"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="setings-item">
+                                <span>
+                                    固定宽度
+                                </span>
+
+                                <div class="switch">
+                                    <div class="onoffswitch">
+                                        <input type="checkbox" name="boxedlayout" class="onoffswitch-checkbox" id="boxedlayout">
+                                        <label class="onoffswitch-label" for="boxedlayout">
+                                            <span class="onoffswitch-inner"></span>
+                                            <span class="onoffswitch-switch"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="title">皮肤选择</div>
+                            <div class="setings-item default-skin nb">
+                                <span class="skin-name ">
+                                    <a href="#" class="s-skin-0">
+                                        默认皮肤
+                                    </a>
+                                </span>
+                            </div>
+                            <div class="setings-item blue-skin nb">
+                                <span class="skin-name ">
+                                    <a href="#" class="s-skin-1">
+                                        蓝色主题
+                                    </a>
+                                </span>
+                            </div>
+                            <div class="setings-item yellow-skin nb">
+                                <span class="skin-name ">
+                                    <a href="#" class="s-skin-3">
+                                        黄色主题
+                                    </a>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <!--右侧边栏结束-->
+    </div>
+
+    <!-- 全局js -->
+    <script src="~/a_dmin/js/jquery.min.js?v=2.1.4"></script>
+    <script src="~/a_dmin/js/bootstrap.min.js?v=3.3.6"></script>
+    <script src="~/a_dmin/js/plugins/metisMenu/jquery.metisMenu.js"></script>
+    <script src="~/a_dmin/js/plugins/slimscroll/jquery.slimscroll.min.js"></script>
+    <script src="~/a_dmin/js/plugins/layer/layer.min.js"></script>
+    <!-- 自定义js -->
+    <script src="~/a_dmin/js/wuiplus.js?v=1.0.0"></script>
+    <script src="~/a_dmin/js/contabs.js"></script>
+
+</body>
+</html>

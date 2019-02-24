@@ -1,0 +1,18 @@
+﻿
+@{
+    Layout = "~/Views/Shared/_OpenScLayout.cshtml";
+}
+<div class="default_contents">
+    <div class="user_article">
+        <h1 class="title_txt"><a id="labTitle" href="javascript:void(0);">@ViewBag.OpenSourceDto.OpenSourceTitle</a></h1><div class="blogstory">
+            <div class="labBody">
+                <h3>描述</h3>
+                @Html.Raw(ViewBag.OpenSourceDto.OpenSourceDescribe)
+            </div>
+            <div class="labBody">
+                <h3>内容</h3>
+                @Html.Raw(ViewBag.OpenSourceDto.OpenSourceContent)
+            </div>
+        </div>
+    </div>
+</div>

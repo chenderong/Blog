@@ -1,0 +1,118 @@
+﻿
+@{
+    ViewData["Title"] = "Add";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+<script charset="utf-8" src="~/ueditor/ueditor.config.js"></script>
+<script charset="utf-8" src="~/ueditor/ueditor.all.min.js"></script>
+<script charset="utf-8" src="~/ueditor/lang/zh-cn/zh-cn.js"></script>
+<ol class="breadcrumb">
+    <li><a href="/Admin/OpenSource/Index">开源项目管理</a></li>
+    <li class="active">@ViewBag.NavTitle</li>
+</ol>
+
+
+<div class="form-horizontal" role="form">
+
+    <div class="form-group">
+        <label for="lastname" class="col-sm-2 control-label">开源项目类别</label>
+        <div class="col-sm-9">
+            <input type="hidden" id="OpenSourceID" value="@ViewBag.OpenSourceDto.OpenSourceID" />
+            <input id="OpenSourceType" type="text" class="form-control" maxlength="200" placeholder="请输入开源项目类别" value="@ViewBag.OpenSourceDto.OpenSourceType" />
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="lastname" class="col-sm-2 control-label">开源项目标题</label>
+        <div class="col-sm-9">
+            <input id="OpenSourceTitle" type="text" class="form-control" maxlength="200" placeholder="请输入开源项目标题" value="@ViewBag.OpenSourceDto.OpenSourceTitle" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="lastname" class="col-sm-2 control-label">开源项目描述</label>
+        <div class="col-sm-9">
+            <input id="OpenSourceDescribe" type="text" class="form-control" maxlength="200" placeholder="请输入开源项目描述" value="@ViewBag.OpenSourceDto.OpenSourceDescribe" />
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="lastname" class="col-sm-2 control-label">开源项目内容</label>
+        <div class="col-sm-9">
+            <script id="editor" type="text/plain" style="height:350px;">
+                @Html.Raw(ViewBag.OpenSourceDto.OpenSourceContent)
+            </script>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-2">
+            <button id="btnBlogClick" type="button" class="btn btn-primary">@ViewBag.Btn</button>
+        </div>
+    </div>
+</div>
+
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabel">提示信息</h4>
+            </div>
+            <div id="mdText" class="modal-body">提示信息</div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal">确定</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+
+@Html.AntiForgeryToken()
+
+<script type="text/javascript">
+    var pageReload = false;
+    //实例化编辑器
+    //建议使用工厂方法getEditor创建和引用编辑器实例，如果在某个闭包下引用该编辑器，直接调用UE.getEditor('editor')就能拿到相关的实例
+    $(function () {
+
+        //模态窗体 关闭后动作
+        $('#myModal').on('hidden.bs.modal', function () {
+            // 执行一些动作...
+            //重新加载页面
+            if (pageReload) {
+                location.reload();
+            }
+        })
+
+        var ue = UE.getEditor('editor');
+        ue.addListener('ready', function (editor) {
+            @*UE.getEditor('editor').setContent('@Html.Raw(ViewBag.OpenSourceDto.OpenSourceContent)', false);*@
+        });
+
+        $("#btnBlogClick").click(function () {
+            pageReload = false;
+            var OpenSourceID = $("#OpenSourceID").val();
+            var content = UE.getEditor('editor').getContent();
+            var OpenSourceType = $("#OpenSourceType").val();
+            var OpenSourceTitle = $("#OpenSourceTitle").val();
+            var OpenSourceDescribe = $("#OpenSourceDescribe").val();
+            var token = $("input[name='__RequestVerificationToken']").val();
+            $.post("/Admin/OpenSource/Add", { OpenSourceID: OpenSourceID, OpenSourceType: OpenSourceType, OpenSourceTitle: OpenSourceTitle, OpenSourceDescribe: OpenSourceDescribe, OpenSourceContent: content, __RequestVerificationToken: token }, function (data) {
+                if (data.code === 0) {
+                    if (parseInt(OpenSourceID) ==0) {
+                        pageReload = true;
+                    }
+                }
+                showDialog(data.msg);
+            });
+
+        });
+    });
+
+    function showDialog(msg) {
+        $('#mdText').text(msg)
+        $('#myModal').modal('show')
+    }
+
+</script>
+

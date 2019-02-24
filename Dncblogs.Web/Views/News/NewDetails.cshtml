@@ -1,0 +1,172 @@
+﻿
+@{
+    Layout = "~/Views/Shared/_DetailLayout.cshtml";
+}
+<div class="default_contents">
+    <div class="user_article">
+        <h1 class="title_txt"><a id="labTitle" href="javascript:void(0)">@ViewBag.NewsDto.Title</a></h1><div class="blogstory">
+            <div id="labBody">
+                @Html.Raw(ViewBag.NewsDto.Body)
+                <div class="post-tag" id="labTag">
+                    @{
+                        if (!string.IsNullOrEmpty(ViewBag.NewsDto.KeyWord))
+                        {
+                            <span style="font-size:16px;">
+                                关键字：
+                            </span>
+                            <span>&nbsp;</span>
+                            <span style="font-size:16px;color:blue;">@ViewBag.NewsDto.KeyWord</span>
+                        }
+                    }
+                </div>
+                <p class="right articalinfo">
+                    <span id="labEdit" style="display:none;"><a id="labID" href="/cyq1162/admin/article-edit-58060">编辑</a></span>
+                    <label>评论</label><label id="labCommentCount">(@ViewBag.NewsDto.CommentCount)</label> | <label>浏览</label><label id="labHits">(@ViewBag.NewsDto.VisitCount)</label>
+                </p>
+                <div style="text-align: left;">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="linebox">
+        <h3>评论列表</h3>
+    </div>
+
+    <div id="comments">
+
+    </div>
+
+    <div class="replyBox" id="replyBoxOrg">
+        <div id="divSendMessage">
+            <div class="comment_replyer">
+                @if (TempData["LoginUser"] == null)
+                {
+                    <text>昵称:</text><input id="txtUserName" class="repalyTitle" type="text" maxlength="30" value="匿名用户" />
+                    <input id="txtUserId" class="repalyTitle" hidden="hidden" type="text" value="0" />
+                }
+                else
+                {
+                    <text>昵称:</text><input id="txtUserName" class="repalyTitle" readonly="readonly" type="text" maxlength="30" value="@(((UserDto)TempData["LoginUser"]).UserName)" />
+                    <input id="txtUserId" class="repalyTitle" hidden="hidden" type="text" value="@(((UserDto)TempData["LoginUser"]).UserId)" />
+                }
+            </div>
+            <div class="comment_replycontent">
+                <textarea id="txtComment" maxlength="800" cols="80" rows="5"></textarea>
+            </div>
+            <div class="comment_replybutton">
+                <input id="btnAddNewCommnet" type="button" class="repalyButtonSend" value="发表" />
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+$(function () {
+
+     //加载评论
+     loadNewsComment(@ViewBag.NewsDto.NewsId);
+
+      //回复按钮事件
+     //$("#btnShowAddNew").click(function () {
+     //     $("#replyBoxOrg").toggle();
+     // });
+
+
+     //添加评论
+     $("#btnAddNewCommnet").click(function () {
+         var newsId = @ViewBag.NewsDto.NewsId;
+         var userId = $("#txtUserId").val();
+         var referenceId = 0;
+         var userName = $("#txtUserName").val();
+         var content = $("#txtComment").val();
+          if (userName==="") {
+              alert("昵称不能为空！");
+              return;
+          }
+          if (content === "") {
+                alert("请输入评论内容！");
+                return;
+           }
+         $.ajax({
+             type: "post",
+             url: "/News/AddNewsCommnet",
+             data: { NewsId: newsId, ReferenceId: referenceId, PostId: userId, PostName: userName, Content: content},
+             success: function (msg) {
+                  $("#txtComment").val("");
+                  loadNewsComment(newsId);
+             }});
+         });
+     });
+
+    function loadNewsComment(newsId) {
+        $.ajax({
+            type: "post",
+            url: "/News/ShowNewsCommnet",
+            data: { id: newsId },
+            success: function (obj) {
+                if (obj.code == 0) {
+                    if (obj.data === "") {
+                     $("#comments").html("暂无评论!");
+                    } else {
+                        $("#comments").html(obj.rows);
+                    }
+                } else {
+                    $("#comments").html("加载评论失败!");
+                }
+
+                $(".comment_reply").click(function () {
+                    //$(this).next().toggle();
+                    //$(this).parent().next().next().find(".replyBox").toggle();
+                    $(this).parent().parent().find(".replyBox").last().toggle()
+                });
+                //提交回复事件
+                $(".repalyButton").click(function () {
+                    var referenceId = $(this).attr("refId");
+                    var userName = $(this).parent().prev().prev().find("input").val();
+                    var content = $(this).parent().prev().find("textarea").val();
+                    //alert(referenceId + "  " + content + "  " + userName);
+                    addReplyCommnet(referenceId, userName, content)
+                });
+
+                //关闭按钮
+                $(".closeButton").click(function () {
+                    //var referenceId = $(this).attr("refId");
+                    $(this).parent().parent().toggle();
+                    //$(this).trigger("click");
+                });
+
+            },
+            error: function (obj) {
+                $("#comments").html("加载评论失败!");
+            }
+        })
+
+    }
+
+    function addReplyCommnet(referenceId, userName, content) {
+        var newsId = @ViewBag.NewsDto.NewsId;
+        var userId = $("#txtUserId").val();
+
+        if (userName==="") {
+            alert("昵称不能为空！");
+            return;
+        }
+
+        if (content === "") {
+            alert("请输入评论内容！");
+            return;
+        }
+
+        $.ajax({
+            type: "post",
+            url: "/News/AddNewsCommnet",
+            data: { NewsId: newsId, ReferenceId: referenceId, PostId: userId, PostName: userName, Content: content },
+            success: function (msg) {
+                $("#txtComment").val("");
+                loadNewsComment(newsId);
+            }
+        });
+    }
+
+</script>
+

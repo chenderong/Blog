@@ -1,0 +1,161 @@
+﻿
+@{
+    Layout = "~/Areas/User/Views/Shared/_Layout.cshtml";
+}
+<ol class="breadcrumb">
+    <li class="active">博客信息</li>
+</ol>
+
+
+<div class="form-horizontal" role="form">
+    <div class="form-group">
+        <label for="lastname" class="col-sm-2 control-label">用户名</label>
+        <div class="col-sm-7">
+            <input id="UserName" type="text" class="form-control" maxlength="200" placeholder="请输入用户名" value="@ViewBag.User.UserName" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="lastname" class="col-sm-2 control-label">图像</label>
+        <div class="col-sm-1">
+            <img id="imgUserHead" src="@ViewBag.User.UserHeadImaUrl" class="img-responsive" />
+        </div>
+        <div class="col-sm-2">
+            <input id="UserHeadImaUrl" type="hidden" value="@ViewBag.User.UserHeadImaUrl" />
+            <input type="file" id="myFile" name="myFile" style="display:none;" />
+            <span id="myVideoText"></span>
+            <input type="button" id="btnFileSelect" class="btn-default btn-primary" value="浏览" />
+        </div>
+        <div class="col-sm-2">
+            <input type="button" id="btnUpload" class="btn-default btn-primary" value="上传图片" />
+
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="lastname" class="col-sm-2 control-label">个人博客名称</label>
+        <div class="col-sm-7">
+            <input id="BlogName" type="text" class="form-control" maxlength="200" placeholder="请输入博客名称" value="@ViewBag.User.BlogName" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="lastname" class="col-sm-2 control-label">博客描述</label>
+        <div class="col-sm-7">
+            <input id="BlogDesc" type="text" class="form-control" maxlength="200" placeholder="请输入备注" value="@ViewBag.User.BlogDesc" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="lastname" class="col-sm-2 control-label">公告信息</label>
+        <div class="col-sm-7">
+            <input id="BlogNotice" type="text" class="form-control" maxlength="200" placeholder="请输入序号" value="@ViewBag.User.BlogNotice" />
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-sm-offset-6 col-sm-2">
+            <button id="btnBlogClick" type="button" class="btn btn-primary">修改</button>
+        </div>
+    </div>
+</div>
+
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabel">提示信息</h4>
+            </div>
+            <div id="mdText" class="modal-body">提示信息</div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal">确定</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+
+@Html.AntiForgeryToken()
+
+<script type="text/javascript">
+    var pageReload = false;
+    //实例化编辑器
+    //建议使用工厂方法getEditor创建和引用编辑器实例，如果在某个闭包下引用该编辑器，直接调用UE.getEditor('editor')就能拿到相关的实例
+    $(function () {
+
+        //模态窗体 关闭后动作
+        $('#myModal').on('hidden.bs.modal', function () {
+            // 执行一些动作...
+            //重新加载页面
+            if (pageReload) {
+                location.reload();
+            }
+        })
+
+
+        $("#btnFileSelect").click(function () {
+            $('input[id=myFile]').click();
+        });
+
+        $("#myFile").change(function (file) {
+            var upload_file = $.trim($("#myFile").val());    //获取上传文件
+            $('#myVideoText').text(upload_file);     //赋值给自定义input框
+        });
+
+
+        $("#btnUpload").click(function () {
+            //var file = document.getElementById("myFile");
+            //var data = new FormData(file);
+            var token = $("input[name='__RequestVerificationToken']").val();
+            var fileUpload = $("#myFile").get(0);
+            var files = fileUpload.files;
+            var data = new FormData();
+            data.append('__RequestVerificationToken', token);
+            for (var i = 0; i < files.length; i++) {
+                data.append(files[i].name, files[i]);
+            }
+            $.ajax({
+                type: "POST",
+                url: '/FileOperate/ImgUpload/',
+                contentType: false,
+                processData: false,
+                data: data,
+                success: function (data) {
+                    if (data.code == 0) {
+                        $("#UserHeadImaUrl").val(data.msg);
+                        $("#imgUserHead").attr('src', data.msg);
+                        showDialog("上传图片成功！");
+                    } else {
+                        showDialog(data.msg);
+                    }
+                },
+                error: function () {
+                    showDialog("上传图片出错！");
+                }
+            });
+            //$("#UserHeadImaUrl").val(data.msg);
+        });
+
+
+        $("#btnBlogClick").click(function () {
+            pageReload = false;
+            var userName = $("#UserName").val();
+            var userHeadImaUrl = $("#UserHeadImaUrl").val();
+            var blogTitle = $("#BlogTitle").val();
+            var blogName = $("#BlogName").val();
+            var blogDesc = $("#BlogDesc").val();
+            var blogNotice = $("#BlogNotice").val();
+            var token = $("input[name='__RequestVerificationToken']").val();
+            $.post("/User/User/Update/", { UserName: userName, UserHeadImaUrl: userHeadImaUrl, BlogTitle: blogTitle, BlogName: blogName, BlogDesc: blogDesc, BlogNotice: blogNotice, __RequestVerificationToken: token }, function (data) {
+                if (data.code === 0) {
+                    pageReload = true;
+                }
+                showDialog(data.msg);
+            });
+
+        });
+    });
+
+    function showDialog(msg) {
+        $('#mdText').text(msg)
+        $('#myModal').modal('show')
+    }
+
+</script>

@@ -1,0 +1,21 @@
+﻿@media screen and (max-width: 800px) {
+    #body_sidebar {
+        margin: 5px 0 0;
+        width: 0px;
+        display: none;
+    }
+    #body_content {
+        margin: 3px;
+    }
+   
+
+    .default_contents {
+        text-align: left;
+        margin: 5px;
+        width: 99%;
+        border: 1px solid #CCC;
+        word-break: break-all;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}

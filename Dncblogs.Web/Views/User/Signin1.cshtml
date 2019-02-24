@@ -1,0 +1,73 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Signin</title>
+    <link href="~/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/css/signin_bundle.css" rel="stylesheet" />
+    <script src="~/bootstrap/js/bootstrap.min.js"></script>
+</head>
+<body>
+    <div style="width: 100%;">
+        <div align="center">
+            <div id="Main">
+                <noscript>
+                    <div style="font-size:15px;margin-bottom:20px;">
+                        您的浏览器未启用Javascript，无法进行登录。
+                    </div>
+                    <style>
+                        form {
+                            display: none;
+                        }
+                    </style>
+                </noscript>
+                <form method="post" onsubmit="return false;">
+                    <div id="Heading">登录胖子编程 - 代码改变世界</div>
+                    <div class="block">
+                        <label class="label-line">登录用户名(<a href="/GetUsername.aspx" tabindex="-1" class="tb_right">找回</a>)</label>
+                        <input type="text" id="input1" value="" class="input-text" onkeydown="check_enter(event)" /> <span id="tip_input1" class="tip"></span>
+                    </div>
+                    <div class="block">
+                        <label class="label-line">密码(<a href="/GetMyPassword.aspx" tabindex="-1" class="tb_right">重置</a>)</label>
+                        <input type="password" id="input2" value="" class="input-text" autocomplete="new-password" onkeydown="check_enter(event)" /> <span id="tip_input2" class="tip"></span>
+                    </div>
+
+                    <div class="modal fade" id="checkWay" tabindex="-1" role="dialog" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content center-block">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                                    <h4 class="modal-title">
+                                        请完成人机识别验证
+                                    </h4>
+                                </div>
+                                <div class="modal-body">
+                                    <div id="showLoading" class="ladda-button" data-style="zoom-in"></div>
+                                    <div id="captchaBox" class="center-block">
+                                        <span id="geetestLoading"> 验证码组件加载中,请稍后...</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="block">
+                        <input id="remember_me" type="checkbox" name="remember_me" onkeydown="check_enter(event)" /><label for="remember_me" onkeydown="check_enter(event)">下次自动登录</label>
+                    </div>
+                    <div class="block">
+                        <input type="submit" id="signin" class="button" value="加载中..." /> <span id="tip_btn" class="tip"></span>
+                    </div>
+                </form>
+                <div style="clear: both" />
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
