@@ -12,7 +12,7 @@ namespace Dncblogs.Web.AotuMapper
     public static class MapperConfig
     {
         private readonly static string DateTimeFormString = "yyyy-MM-dd HH:mm:ss";
-
+         
         /// <summary>
         /// 初始化autoMapper 映射
         /// </summary>
