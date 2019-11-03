@@ -7,7 +7,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width" />
-    <title>@ViewBag.WebStaticConfig.WebName-登陆</title>
+    <title>@ViewBag.WebStaticConfig.WebName-绑定账号</title>
     <link href="~/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
     <script src="~/js/jquery-1.12.4.min.js"></script>
     <script src="~/bootstrap/js/bootstrap.min.js"></script>
@@ -59,30 +59,36 @@
                     <div class="m-b"></div>
                 </div>
             </div>
+            @if (ViewBag.IsError)
+            {
             <div class="col-sm-5">
-                <!--使用了asp-controller asp-action 标签 前端就会自动生成Token-->
+                <span style="color:red">
+                    @ViewBag.ErrorMessage
+                </span>
+            </div>
+            }
+            else
+            {
+            <div class="col-sm-5">
                 <form id="loginForm" method="post">
-                    <h4 class="no-margins">登录：</h4>
+                    <h4 class="no-margins">绑定账号</h4>
                     <div class="form-group">
-                        <!--使用form-group包裹表单，才能正确的显示前端验证提示信息-->
                         <input id="loginName" type="text" class="form-control uname" placeholder="用户名" />
+                    </div>
+                    <div class="form-group" id="userNameDiv">
+                        <input id="userName" type="text" class="form-control uname" placeholder="显示昵称" />
                     </div>
                     <div class="form-group">
                         <input id="password" type="password" class="form-control pword m-b" placeholder="密码" />
                     </div>
-                    @*<div class="form-group">
-            <input id="chcekCode" type="text" class="form-control" asp-for="validateCode" placeholder="验证码" />
-        </div>
-        <div class="form-group">
-            <img id="imgVerify" src="/ValidateCode/ValidateCode" alt="看不清？点击更换" onclick="this.src = this.src + '?'" style="vertical-align:middle;" />
-        </div>*@
-                    <button id="btnLogin" class="btn  btn-block btn-primary" type="button">登录</button>
+                    <button id="btnLogin" class="btn  btn-block btn-primary" type="button">绑定</button>
                     <br />
-                    @*<a id="btnLoginGitHub" class="btn   btn-primary" href="https://github.com/login/oauth/authorize?client_id=ceffa2f739f9220d4c2b&redirect_uri=http://localhost:55207/Oauth/Redirect&scope=user:email">GitHub账号登录</a>*@
-                    <a id="btnLoginGitHub" class="btn   btn-primary" href="@ViewBag.GitHubLogin">GitHub账号登录</a>
                     <song class="text-warning"></song>
+                    <button id="btnRegist" class="btn  btn-block btn-primary" type="button">没有账号,注册账号</button>
                 </form>
             </div>
+            }
+            <input id="loginID" hidden value="@ViewBag.GitHubUser.login" />
         </div>
         <div class="signup-footer">
             <div class="pull-left">
@@ -114,7 +120,7 @@
     <script>
 
         //var pageReload = false;
-
+        var type = 0;//0 有账号直接绑定  1 没账号注册账号绑定
         $(document).keyup(function (event) {
             if (event.keyCode == 13) {
                 $("#btnLogin").trigger("click");
@@ -137,41 +143,58 @@
 
             //})
 
+            var userNameDiv = $("#userNameDiv");
+            userNameDiv.hide();
+            var btnRegist = $("#btnRegist");
+
             $("#btnLogin").click(function () {
                 pageReload = false;
                 pageJumps = "";
-
                 var loginName = $("#loginName").val();
+                var userName = $("#userName").val();
                 var password = $("#password").val();
                 var chcekCode = $("#chcekCode").val();
                 var token = $("input[name='__RequestVerificationToken']").val();
-
+                var loginID = $("#loginID").val();
                 if (loginName == "") {
                     showDialog("用户名不能为空");
                     return;
                 }
-
                 if (password == "") {
                     showDialog("密码不能为空");
                     return;
                 }
+                //if (chcekCode == "") {
+                //    showDialog("验证码不能为空");
+                //    return;
+                //}
 
-                if (chcekCode == "") {
-                    showDialog("验证码不能为空");
-                    return;
-                }
-
-                $.post("/User/Login/date=" + new Date().getTime(), { LoginName: loginName, Password: password, ChcekCode: chcekCode, __RequestVerificationToken: token }, function (data) {
+                $.post("/Oauth/BindingAccount/date=" + new Date().getTime(), { LoginID: loginID, LoginName: loginName, UserName: userName, Password: password, Type: type, ChcekCode: chcekCode, __RequestVerificationToken: token }, function (data) {
                     if (data.code === 0) {
                         location.href = data.rows;
                     }
                     else {
                         //pageReload = true;
-                        $("#imgVerify").click();
+                        //$("#imgVerify").click();
                         showDialog(data.msg);
                     }
                 });
             });
+
+
+            $("#btnRegist").click(function () {
+                if (type == 0) {
+                    userNameDiv.show();
+                    type = 1;
+                    btnRegist.text("已有账号，绑定账号");
+                } else {
+                    userNameDiv.hide();
+                    type = 0;
+                    btnRegist.text("没有账号,注册账号");
+                }
+            });
+
+
 
         });
     </script>

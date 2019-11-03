@@ -24,10 +24,12 @@ namespace Dncblogs.Web.Controllers
         readonly ILogger logger;
         private UserService _userService;
         private WebStaticConfig _webStaticConfig;
-        public UserController(UserService userService, ILoggerFactory loggerFactory, IOptions<WebStaticConfig> options)
+        private GitHubSetting _gitHubSetting;
+        public UserController(UserService userService, ILoggerFactory loggerFactory, IOptions<WebStaticConfig> webStaticConfig, IOptions<GitHubSetting> gitHubSetting)
         {
             this._userService = userService;
-            this._webStaticConfig = options.Value;
+            this._webStaticConfig = webStaticConfig.Value;
+            this._gitHubSetting = gitHubSetting.Value;
             logger = loggerFactory.CreateLogger(typeof(UserController));
 
         }
@@ -40,6 +42,8 @@ namespace Dncblogs.Web.Controllers
         public IActionResult Signin()
         {
             ViewBag.WebStaticConfig = this._webStaticConfig;
+            //https://github.com/login/oauth/authorize?client_id=ceffa2f739f9220d4c2b&redirect_uri=http://localhost:55207/Oauth/Redirect
+            ViewBag.GitHubLogin = string.Format(this._gitHubSetting.authorize_uri, this._gitHubSetting.client_id, this._gitHubSetting.redirect_uri);
             return View();
         }
 
@@ -117,6 +121,7 @@ namespace Dncblogs.Web.Controllers
         public IActionResult Register()
         {
             ViewBag.WebStaticConfig = this._webStaticConfig;
+            ViewBag.GitHubLogin = string.Format(this._gitHubSetting.authorize_uri, this._gitHubSetting.client_id, this._gitHubSetting.redirect_uri);
             return View();
         }
 

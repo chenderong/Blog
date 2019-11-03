@@ -1,16 +1,16 @@
 /*
 Navicat MySQL Data Transfer
 
-Source Server         : 腾讯云123.207.121.98
-Source Server Version : 50722
-Source Host           : 123.207.121.98:3306
+Source Server         : dcoker_mysql01
+Source Server Version : 80018
+Source Host           : localhost:3305
 Source Database       : dncblogs
 
 Target Server Type    : MYSQL
-Target Server Version : 50722
+Target Server Version : 80018
 File Encoding         : 65001
 
-Date: 2018-08-25 14:06:56
+Date: 2019-11-03 15:28:07
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -34,6 +34,7 @@ CREATE TABLE `blog` (
   `VisitCount` int(11) DEFAULT '0',
   `CommentCount` int(11) DEFAULT '0',
   `IsEssence` bit(1) DEFAULT b'0',
+  `isHomePage` bit(1) DEFAULT NULL,
   `IsDelete` bit(1) NOT NULL DEFAULT b'0',
   PRIMARY KEY (`BlogId`),
   KEY `CategoryID` (`CategoryID`),
@@ -43,7 +44,7 @@ CREATE TABLE `blog` (
   KEY `Sort` (`Sort`),
   KEY `IsDelete` (`IsDelete`),
   KEY `IsEssence` (`IsEssence`)
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Table structure for blogcomment
@@ -82,7 +83,7 @@ CREATE TABLE `category` (
   KEY `ParentId` (`ParentId`),
   KEY `Sort` (`Sort`),
   KEY `IsDelete` (`IsDelete`)
-) ENGINE=InnoDB AUTO_INCREMENT=35 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=37 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Table structure for news
@@ -128,6 +129,17 @@ CREATE TABLE `newscomment` (
   KEY `PostId` (`PostId`),
   KEY `PostDate` (`PostDate`),
   KEY `IsDelete` (`IsDelete`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Table structure for oauthuser
+-- ----------------------------
+DROP TABLE IF EXISTS `oauthuser`;
+CREATE TABLE `oauthuser` (
+  `UserId` bigint(20) NOT NULL,
+  `GitHub_login` varchar(200) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
+  `GitHub_id` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`UserId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
@@ -186,4 +198,4 @@ CREATE TABLE `user` (
   KEY `UserId` (`UserId`),
   KEY `LoginName` (`LoginName`),
   KEY `IsDelete` (`IsDelete`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8;

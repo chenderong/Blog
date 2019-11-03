@@ -29,10 +29,11 @@ namespace Dncblogs.Web
     {
         public Startup(IConfiguration configuration)
         {
-            var builder = new ConfigurationBuilder();
-            builder.SetBasePath(Directory.GetCurrentDirectory());
-            builder.AddJsonFile("appsettings.json");
-            Configuration = builder.Build();
+            //var builder = new ConfigurationBuilder();
+            //builder.SetBasePath(Directory.GetCurrentDirectory());
+            //builder.AddJsonFile("appsettings.json");
+            //Configuration = builder.Build();
+            this.Configuration = configuration;
             //初始化autoMapper 映射
             MapperConfig.MapperConfigIntit();
         }
@@ -44,10 +45,11 @@ namespace Dncblogs.Web
         {
             services.Configure<DatabaseSetting>(Configuration.GetSection("DatabaseSetting"));
             services.Configure<WebStaticConfig>(Configuration.GetSection("WebStaticConfig"));
+            services.Configure<GitHubSetting>(Configuration.GetSection("GitHub"));
 
             //注入自己的HttpContext
             //services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-
+            services.AddHttpClient();
             services.AddTransient(typeof(BlogService));
             services.AddTransient(typeof(UserService));
             services.AddTransient(typeof(CategoryService));
@@ -56,6 +58,8 @@ namespace Dncblogs.Web
             services.AddTransient(typeof(NewsService));
             services.AddTransient(typeof(NewsCommentService));
             services.AddTransient(typeof(NoteService));
+            services.AddTransient(typeof(GitHubService));
+            services.AddTransient(typeof(GitHubService));
 
             //services.AddTransientIDCommon("Dncblogs.Core");
             services.Configure<CookiePolicyOptions>(options =>
